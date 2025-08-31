@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Bibliothécaires</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🛡️ Gestion des Bibliothécaires</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}">📚 Livres</a>
+        <a href="{{ url_for('utilisateurs') }}">👥 Étudiants</a>
+        <a href="{{ url_for('emprunts') }}">📋 Emprunts</a>
+        <a href="{{ url_for('admin_bibliothecaires') }}" class="active">🛡️ Bibliothécaires</a>
+        <a href="{{ url_for('recherche') }}">🔍 Recherche</a>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <h2>Liste des Bibliothécaires</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Numéro</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bibliothecaires %}
+                <tr>
+                    <td>{{ b.Nom }}</td>
+                    <td>{{ b.Email }}</td>
+                    <td>{{ b.NumeroEtudiant }}</td>
+                    <td>
+                        {% if b.ID == session.user_id %}
+                            <span class="status-badge current">👤 Vous</span>
+                        {% else %}
+                            <span class="status-badge admin">🛡️ Admin</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        {% if b.ID != session.user_id %}
+                            <a href="{{ url_for('delete_bibliothecaire', id=b.ID) }}" 
+                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce bibliothécaire ?')" 
+                               class="btn btn-delete">🗑️ Supprimer</a>
+                        {% else %}
+                            <span class="text-muted">--</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="form-section">
+            <h3>➕ Ajouter un nouveau bibliothécaire</h3>
+            <form method="post" action="{{ url_for('add_bibliothecaire') }}" class="form-grid">
+                <div class="form-row">
+                    <input type="text" name="nom" placeholder="Nom complet" required>
+                    <input type="email" name="email" placeholder="Email (doit être unique)" required>
+                </div>
+                <div class="form-row">
+                    <input type="text" name="numero" placeholder="Numéro d'employé" required>
+                    <input type="password" name="password" placeholder="Mot de passe" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">🛡️ Ajouter le bibliothécaire</button>
+            </form>
+            
+            <div class="admin-note">
+                <h4>⚠️ Notes importantes :</h4>
+                <ul>
+                    <li>Les bibliothécaires ont accès à toutes les fonctionnalités d'administration</li>
+                    <li>Il doit toujours y avoir au moins un bibliothécaire dans le système</li>
+                    <li>Vous ne pouvez pas supprimer votre propre compte</li>
+                    <li>L'email doit être unique dans tout le système</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Livres</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>📚 Gestion des Livres</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}" {% if request.endpoint == 'livres' %}class="active"{% endif %}>📚 Livres</a>
+    {% if session.role == 'bibliothecaire' %}
+        <a href="{{ url_for('utilisateurs') }}" {% if request.endpoint == 'utilisateurs' %}class="active"{% endif %}>👥 Étudiants</a>
+        <a href="{{ url_for('emprunts') }}" {% if request.endpoint == 'emprunts' %}class="active"{% endif %}>📋 Emprunts</a>
+        <a href="{{ url_for('admin_bibliothecaires') }}" {% if request.endpoint == 'admin_bibliothecaires' %}class="active"{% endif %}>🛡️ Bibliothécaires</a>
+    {% endif %}
+        <a href="{{ url_for('recherche') }}" {% if request.endpoint == 'recherche' %}class="active"{% endif %}>🔍 Recherche</a>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <h2>Liste des Livres</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Auteur</th>
+                    <th>ISBN</th>
+                    <th>Statut</th>
+                    {% if session.role == 'bibliothecaire' %}
+                        <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for livre in livres %}
+                <tr>
+                    <td>{{ livre.Titre }}</td>
+                    <td>{{ livre.Auteur }}</td>
+                    <td>{{ livre.ISBN }}</td>
+                    <td>
+                        <span class="status-badge {{ 'available' if livre.Statut == 'disponible' else 'borrowed' }}">
+                            {{ '✅ Disponible' if livre.Statut == 'disponible' else '📖 Emprunté' }}
+                        </span>
+                    </td>
+                    {% if session.role == 'bibliothecaire' %}
+                    <td class="actions">
+                        <a href="{{ url_for('edit_livre', id=livre.ID) }}" class="btn btn-edit">✏️ Modifier</a>
+                        <a href="{{ url_for('delete_livre', id=livre.ID) }}" 
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')" 
+                           class="btn btn-delete">🗑️ Supprimer</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if session.role == 'bibliothecaire' %}
+        <div class="form-section">
+            <h3>➕ Ajouter un nouveau livre</h3>
+            <form method="post" action="{{ url_for('add_livre') }}" class="form-horizontal">
+                <div class="form-group">
+                    <input type="text" name="titre" placeholder="Titre du livre" required>
+                    <input type="text" name="auteur" placeholder="Auteur" required>
+                    <input type="text" name="isbn" placeholder="ISBN">
+                    <button type="submit" class="btn btn-primary">Ajouter le livre</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

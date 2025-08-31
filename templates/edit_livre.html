@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Éditer Livre</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Accueil</a> |
+        <a href="{{ url_for('livres') }}">Livres</a> |
+        <a href="{{ url_for('utilisateurs') }}">Étudiants</a> |
+        <a href="{{ url_for('emprunts') }}">Emprunts</a> |
+        <a href="{{ url_for('recherche') }}">Recherche</a>
+    </nav>
+    <hr>
+
+    <h1>Éditer Livre</h1>
+    <form method="post">
+        <input type="text" name="titre" value="{{ livre.Titre }}" required>
+        <input type="text" name="auteur" value="{{ livre.Auteur }}" required>
+        <input type="text" name="isbn" value="{{ livre.ISBN }}">
+        <select name="statut">
+            <option value="disponible" {% if livre.Statut == 'disponible' %}selected{% endif %}>Disponible</option>
+            <option value="emprunte" {% if livre.Statut == 'emprunte' %}selected{% endif %}>Emprunté</option>
+        </select>
+        <button type="submit">Enregistrer</button>
+    </form>
+    <a href="{{ url_for('livres') }}">Retour à la liste</a>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Bibliothèque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🏛️ Système de Gestion de Bibliothèque</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
+    <nav>
+        <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}" {% if request.endpoint == 'livres' %}class="active"{% endif %}>📚 Livres</a>
+    {% if session.role == 'bibliothecaire' %}
+        <a href="{{ url_for('utilisateurs') }}" {% if request.endpoint == 'utilisateurs' %}class="active"{% endif %}>👥 Étudiants</a>
+        <a href="{{ url_for('emprunts') }}" {% if request.endpoint == 'emprunts' %}class="active"{% endif %}>📋 Emprunts</a>
+        <a href="{{ url_for('admin_bibliothecaires') }}" {% if request.endpoint == 'admin_bibliothecaires' %}class="active"{% endif %}>🛡️ Bibliothécaires</a>
+    {% endif %}
+        <a href="{{ url_for('recherche') }}" {% if request.endpoint == 'recherche' %}class="active"{% endif %}>🔍 Recherche</a>
+    </nav>
+
+
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="dashboard">
+            <h2>Tableau de bord</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <h3>{{ total_livres }}</h3>
+                        <p>Livres total</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍🎓</div>
+                    <div class="stat-info">
+                        <h3>{{ total_utilisateurs }}</h3>
+                        <p>Étudiants inscrits</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📖</div>
+                    <div class="stat-info">
+                        <h3>{{ total_emprunts }}</h3>
+                        <p>Emprunts en cours</p>
+                    </div>
+                </div>
+            </div>
+            
+            {% if session.role == 'etudiant' %}
+                <div class="student-info">
+                    <h3>Information importante</h3>
+                    <ul>
+                        <li>Vous pouvez emprunter maximum 3 livres à la fois</li>
+                        <li>Durée d'emprunt : 15 jours</li>
+                        <li>Contactez le bibliothécaire pour tout emprunt</li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

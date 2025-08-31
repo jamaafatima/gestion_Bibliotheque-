@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Recherche</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Accueil</a> |
+        <a href="{{ url_for('livres') }}">Livres</a> |
+        <a href="{{ url_for('utilisateurs') }}">Étudiants</a> |
+        <a href="{{ url_for('emprunts') }}">Emprunts</a> |
+        <a href="{{ url_for('recherche') }}">Recherche</a>
+    </nav>
+    <hr>
+
+    <h1>Recherche d'un livre</h1>
+
+    <form method="post" action="{{ url_for('recherche') }}">
+        <input type="text" name="motcle" placeholder="Titre ou Auteur" required>
+        <button type="submit">Rechercher</button>
+    </form>
+
+    {% if livres %}
+    <h2>Résultats :</h2>
+    <ul>
+        {% for livre in livres %}
+        <li>{{ livre.Titre }} - {{ livre.Auteur }} - {{ livre.Statut }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+</body>
+</html>
