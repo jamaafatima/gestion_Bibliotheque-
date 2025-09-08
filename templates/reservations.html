@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Réservations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>📋 Gestion des Réservations</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}">📚 Livres</a>
+        <a href="{{ url_for('utilisateurs') }}">👥 Étudiants</a>
+        <a href="{{ url_for('emprunts') }}">📋 Emprunts</a>
+        <a href="{{ url_for('reservations') }}" class="active">📋 Réservations</a>
+        <a href="{{ url_for('admin_bibliothecaires') }}">🛡️ Bibliothécaires</a>
+        <a href="{{ url_for('recherche') }}">🔍 Recherche</a>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <h2>📋 Réservations en attente</h2>
+        </div>
+
+        {% if reservations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Livre</th>
+                    <th>Auteur</th>
+                    <th>Étudiant</th>
+                    <th>Date de réservation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td><strong>{{ r.Titre }}</strong></td>
+                    <td>{{ r.Auteur }}</td>
+                    <td>{{ r.NomEtudiant }}</td>
+                    <td>{{ r.DateReservation }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('confirmer_reservation', reservation_id=r.ID) }}" 
+                           onclick="return confirm('Confirmer cette réservation et créer un emprunt ?')" 
+                           class="btn btn-success">✅ Confirmer</a>
+                        <a href="{{ url_for('annuler_reservation_admin', reservation_id=r.ID) }}" 
+                           onclick="return confirm('Annuler cette réservation ?')" 
+                           class="btn btn-delete">❌ Annuler</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <h3>📋 Aucune réservation</h3>
+            <p>Il n'y a actuellement aucune réservation en attente.</p>
+        </div>
+        {% endif %}
+
+        <div class="admin-note">
+            <h4>ℹ️ Gestion des réservations :</h4>
+            <ul>
+                <li><strong>Confirmer :</strong> Transforme la réservation en emprunt automatiquement</li>
+                <li><strong>Annuler :</strong> Annule la réservation et remet le livre comme disponible</li>
+                <li>Les étudiants peuvent annuler leurs propres réservations</li>
+                <li>Maximum 3 réservations par étudiant</li>
+            </ul>
+        </div>
+    </main>
+
+    <style>
+    .btn-success {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #229954;
+    }
+    </style>
+</body>
+</html>

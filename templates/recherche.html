@@ -1,36 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Recherche</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche - Bibliothèque</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 <body>
+    <header>
+        <h1>🔍 Recherche de Livres</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
+
     <nav>
-        <a href="{{ url_for('index') }}">Accueil</a> |
-        <a href="{{ url_for('livres') }}">Livres</a> |
-        <a href="{{ url_for('utilisateurs') }}">Étudiants</a> |
-        <a href="{{ url_for('emprunts') }}">Emprunts</a> |
-        <a href="{{ url_for('recherche') }}">Recherche</a>
+        <a href="{{ url_for('index') }}">🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}">📚 Livres</a>
+        {% if session.role == 'bibliothecaire' %}
+            <a href="{{ url_for('utilisateurs') }}">👥 Étudiants</a>
+            <a href="{{ url_for('emprunts') }}">📋 Emprunts</a>
+            <a href="{{ url_for('reservations') }}">📋 Réservations</a>
+            <a href="{{ url_for('admin_bibliothecaires') }}">🛡️ Bibliothécaires</a>
+        {% else %}
+            <a href="{{ url_for('mes_emprunts') }}">📖 Mes Emprunts</a>
+            <a href="{{ url_for('mes_reservations') }}">📋 Mes Réservations</a>
+            <a href="{{ url_for('change_password') }}">🔒 Changer mot de passe</a>
+        {% endif %}
+        <a href="{{ url_for('recherche') }}" class="active">🔍 Recherche</a>
     </nav>
-    <hr>
 
-    <h1>Recherche d'un livre</h1>
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <form method="post" action="{{ url_for('recherche') }}">
-        <input type="text" name="motcle" placeholder="Titre ou Auteur" required>
-        <button type="submit">Rechercher</button>
-    </form>
+        <div class="form-section">
+            <h3>🔍 Rechercher un livre</h3>
+            <form method="post" class="search-form">
+                <div class="search-group">
+                    <input type="text" name="motcle" placeholder="Titre ou auteur du livre..." 
+                           value="{{ request.form.motcle if request.form.motcle }}" required>
+                    <button type="submit" class="btn btn-primary">🔍 Rechercher</button>
+                </div>
+            </form>
+        </div>
 
-    {% if livres %}
-    <h2>Résultats :</h2>
-    <ul>
-        {% for livre in livres %}
-        <li>{{ livre.Titre }} - {{ livre.Auteur }} - {{ livre.Statut }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+        {% if livres %}
+            <div class="page-header">
+                <h2>📖 Résultats de recherche</h2>
+                <p>{{ livres|length }} livre(s) trouvé(s)</p>
+            </div>
 
+            <table>
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Auteur</th>
+                        <th>ISBN</th>
+                        <th>Statut</th>
+                        {% if session.role == 'Étudiant' %}
+                        <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for livre in livres %}
+                    <tr>
+                        <td><strong>{{ livre.Titre }}</strong></td>
+                        <td>{{ livre.Auteur }}</td>
+                        <td>{{ livre.ISBN }}</td>
+                        <td>
+                            {% if livre.Statut == 'disponible' %}
+                                <span class="status-badge available">✅ Disponible</span>
+                            {% elif livre.Statut == 'emprunte' %}
+                                <span class="status-badge borrowed">📖 Emprunté</span>
+                            {% elif livre.Statut == 'reserve' %}
+                                <span class="status-badge reserved">📋 Réservé</span>
+                            {% endif %}
+                        </td>
+                        {% if session.role == 'Étudiant' %}
+                        <td class="actions">
+                            {% if livre.Statut == 'disponible' %}
+                                <a href="{{ url_for('reserver_livre', livre_id=livre.ID) }}" 
+                                   onclick="return confirm('Voulez-vous réserver ce livre ?')"
+                                   class="btn btn-reserve">📋 Réserver</a>
+                            {% else %}
+                                <span class="text-muted">Non disponible</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% elif request.method == 'POST' %}
+            <div class="empty-state">
+                <h3>🔍 Aucun résultat</h3>
+                <p>Aucun livre trouvé pour votre recherche.</p>
+                <p>Essayez avec d'autres mots-clés.</p>
+            </div>
+        {% endif %}
+
+        <div class="search-tips">
+            <h3>💡 Conseils de recherche</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">📚</div>
+                    <div class="tip-text">
+                        <h4>Recherche par titre</h4>
+                        <p>Tapez quelques mots du titre du livre</p>
+                    </div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">✍️</div>
+                    <div class="tip-text">
+                        <h4>Recherche par auteur</h4>
+                        <p>Tapez le nom ou prénom de l'auteur</p>
+                    </div>
+                </div>
+                
+                {% if session.role == 'etudiant' %}
+                <div class="tip-card">
+                    <div class="tip-icon">📋</div>
+                    <div class="tip-text">
+                        <h4>Réserver un livre</h4>
+                        <p>Cliquez sur "Réserver" pour les livres disponibles</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <style>
+    .search-form {
+        margin: 0;
+    }
+    
+    .search-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .search-group input {
+        flex: 1;
+        margin: 0;
+    }
+    
+    .btn-reserve {
+        background: #17a2b8;
+        color: white;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    
+    .btn-reserve:hover {
+        background: #138496;
+    }
+    
+    .status-badge.reserved {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .text-muted {
+        color: #6c757d;
+        font-style: italic;
+    }
+    
+    .search-tips {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+    
+    .search-tips h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .tip-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .tip-icon {
+        font-size: 2rem;
+    }
+    
+    .tip-text h4 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .tip-text p {
+        color: #666;
+        margin: 0;
+    }
+    </style>
 </body>
 </html>

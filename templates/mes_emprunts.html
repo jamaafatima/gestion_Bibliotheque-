@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Emprunts - Bibliothèque</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>📚 Mes Emprunts</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}">📚 Livres</a>
+        <a href="{{ url_for('recherche') }}">🔍 Recherche</a>
+        <a href="{{ url_for('mes_emprunts') }}" class="active">📖 Mes Emprunts</a>
+        <a href="{{ url_for('mes_reservations') }}">📋 Mes Réservations</a>
+        <a href="{{ url_for('change_password') }}">🔒 Changer mot de passe</a>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <h2>📖 Mes livres empruntés</h2>
+        </div>
+
+        {% if emprunts %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Livre</th>
+                        <th>Auteur</th>
+                        <th>Date d'emprunt</th>
+                        <th>Date de retour prévue</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in emprunts %}
+                    <tr class="{{ 'overdue' if e.Statut == 'En retard' else '' }}">
+                        <td><strong>{{ e.Titre }}</strong></td>
+                        <td>{{ e.Auteur }}</td>
+                        <td>{{ e.DateEmprunt }}</td>
+                        <td>{{ e.DateRetourPrevue }}</td>
+                        <td>
+                            {% if e.Statut == 'En retard' %}
+                                <span class="status-badge overdue">⚠️ En retard</span>
+                            {% else %}
+                                <span class="status-badge ok">✅ À temps</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="return-info">
+                <h3>📞 Pour retourner un livre</h3>
+                <p>Contactez le bibliothécaire ou rendez-vous directement au comptoir de la bibliothèque avec votre livre.</p>
+                {% if emprunts|selectattr("Statut", "equalto", "En retard")|list %}
+                    <div class="overdue-warning">
+                        <h4>⚠️ Attention !</h4>
+                        <p>Vous avez des livres en retard. Veuillez les retourner rapidement pour éviter des pénalités.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+        {% else %}
+            <div class="empty-state">
+                <h3>📚 Aucun livre emprunté</h3>
+                <p>Vous n'avez actuellement aucun livre emprunté.</p>
+                <p>Consultez le <a href="{{ url_for('livres') }}">catalogue</a> ou utilisez la <a href="{{ url_for('recherche') }}">recherche</a> pour réserver des livres.</p>
+            </div>
+        {% endif %}
+
+        <div class="borrowing-rules">
+            <h3>📋 Rappel des règles</h3>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-icon">3️⃣</div>
+                    <div class="rule-text">
+                        <h4>Maximum 3 livres</h4>
+                        <p>Vous pouvez emprunter au maximum 3 livres simultanément</p>
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-icon">📅</div>
+                    <div class="rule-text">
+                        <h4>15 jours d'emprunt</h4>
+                        <p>Chaque livre peut être emprunté pour une durée de 15 jours</p>
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-icon">📞</div>
+                    <div class="rule-text">
+                        <h4>Contact bibliothécaire</h4>
+                        <p>Le bibliothécaire gère les emprunts et retours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

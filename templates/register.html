@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenue à la bibliotheque FPO</title>
+    <title>Inscription - Bibliothèque</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,13 +15,13 @@
             align-items: center;
             justify-content: center;
         }
-        .login-container {
+        .register-container {
             background: white;
             border-radius: 10px;
             padding: 40px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
         }
         h2 {
             text-align: center;
@@ -38,7 +38,7 @@
             color: #555;
             font-weight: bold;
         }
-        input[type="email"], input[type="password"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #ddd;
@@ -47,15 +47,15 @@
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
-        input[type="email"]:focus, input[type="password"]:focus {
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
             outline: none;
             border-color: #1e3c72;
         }
-        .btn-login {
+        .btn-register {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            color: #1e3c72;
             border: none;
             border-radius: 6px;
             font-size: 16px;
@@ -64,22 +64,19 @@
             transition: transform 0.2s;
             margin-bottom: 20px;
         }
-        .btn-login:hover {
+        .btn-register:hover {
             transform: translateY(-2px);
         }
-        .register-link {
+        .login-link {
             text-align: center;
             color: #666;
-            padding: 15px 0;
-            border-top: 1px solid #eee;
-            margin-top: 20px;
         }
-        .register-link a {
+        .login-link a {
             color: #1e3c72;
             text-decoration: none;
             font-weight: bold;
         }
-        .register-link a:hover {
+        .login-link a:hover {
             text-decoration: underline;
         }
         .alert {
@@ -100,8 +97,8 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Bienvenue à la bibliothèque FPO</h2>
+    <div class="register-container">
+        <h2>📚 Inscription Étudiant</h2>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -113,10 +110,20 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" action="/login">
+        <form method="POST">
+            <div class="form-group">
+                <label for="nom">👤 Nom complet :</label>
+                <input type="text" id="nom" name="nom" required>
+            </div>
+            
             <div class="form-group">
                 <label for="email">📧 Email :</label>
                 <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="numero">🎓 Numéro étudiant :</label>
+                <input type="text" id="numero" name="numero" required>
             </div>
             
             <div class="form-group">
@@ -124,11 +131,16 @@
                 <input type="password" id="password" name="password" required>
             </div>
             
-            <button type="submit" class="btn-login">Se connecter</button>
+            <div class="form-group">
+                <label for="confirm_password">🔒 Confirmer le mot de passe :</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            
+            <button type="submit" class="btn-register">Créer mon compte</button>
         </form>
         
-        <div class="register-link">
-            Pas encore de compte étudiant ? <a href="{{ url_for('register') }}">S'inscrire</a>
+        <div class="login-link">
+            Vous avez déjà un compte ? <a href="{{ url_for('login') }}">Se connecter</a>
         </div>
     </div>
 </body>

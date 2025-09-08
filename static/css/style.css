@@ -14,7 +14,7 @@ body {
 
 /* Header */
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     color: white;
     padding: 1rem 2rem;
     display: flex;
@@ -35,7 +35,7 @@ header h1 {
 }
 
 .btn-logout {
-    background: rgba(255,255,255,0.2);
+    background: rgba(212, 175, 55, 0.9);
     color: white;
     padding: 8px 15px;
     text-decoration: none;
@@ -44,7 +44,7 @@ header h1 {
 }
 
 .btn-logout:hover {
-    background: rgba(255,255,255,0.3);
+    background: #d4af37;
 }
 
 /* Navigation */
@@ -131,13 +131,132 @@ main {
 .stat-info h3 {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #667eea;
+    color: #1e3c72;
     margin-bottom: 0.5rem;
 }
 
 .stat-info p {
     color: #666;
     font-size: 1.1rem;
+}
+
+/* Nouveaux styles pour l'espace étudiant */
+.student-dashboard {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.welcome-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+}
+
+.welcome-text h3 {
+    color: #1e3c72;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-text p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.student-actions {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.student-actions h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-card {
+    background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+}
+
+.action-icon {
+    font-size: 2rem;
+}
+
+.action-text {
+    font-weight: 500;
+}
+
+/* Raccourcis admin */
+.admin-shortcuts {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+}
+
+.admin-shortcuts h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.shortcut-card {
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+    color: #1e3c72;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s;
+}
+
+.shortcut-card:hover {
+    transform: translateY(-3px);
+}
+
+.shortcut-icon {
+    font-size: 2rem;
+}
+
+.shortcut-text {
+    font-weight: 500;
 }
 
 /* Tables */
@@ -158,7 +277,7 @@ th, td {
 }
 
 th {
-    background: #667eea;
+    background: #1e3c72;
     color: white;
     font-weight: bold;
 }
@@ -182,21 +301,21 @@ tr:hover {
 }
 
 .btn-primary {
-    background: #667eea;
+    background: #1e3c72;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5a67d8;
+    background: #2a5298;
 }
 
 .btn-edit {
-    background: #f39c12;
+    background: #d4af37;
     color: white;
 }
 
 .btn-edit:hover {
-    background: #e67e22;
+    background: #f4d03f;
 }
 
 .btn-delete {
@@ -274,7 +393,7 @@ input[type="text"], input[type="email"], input[type="password"], select {
 
 input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #1e3c72;
 }
 
 .form-note {
@@ -314,6 +433,16 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
     color: #721c24;
 }
 
+.status-badge.current {
+    background: #1e3c72;
+    color: white;
+}
+
+.status-badge.admin {
+    background: #d4af37;
+    color: #1e3c72;
+}
+
 /* Special states */
 .overdue {
     background-color: #ffeaa7;
@@ -328,7 +457,7 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
 }
 
 .empty-state h3 {
-    color: #74b9ff;
+    color: #1e3c72;
     margin-bottom: 1rem;
 }
 
@@ -362,21 +491,21 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
 .student-info li {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 25px;
+}
+
+.student-info li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #27ae60;
+    font-weight: bold;
 }
 
 /* Actions column */
 .actions {
     white-space: nowrap;
-}
-
-.status-badge.current {
-    background: #74b9ff;
-    color: white;
-}
-
-.status-badge.admin {
-    background: #6c5ce7;
-    color: white;
 }
 
 .admin-note {
@@ -412,7 +541,7 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
         align-items: stretch;
     }
     
-    .stats-grid {
+    .stats-grid, .actions-grid, .shortcuts-grid {
         grid-template-columns: 1fr;
     }
     
@@ -427,6 +556,11 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
     .user-info {
         flex-direction: column;
         gap: 10px;
+        text-align: center;
+    }
+    
+    .welcome-card, .action-card, .shortcut-card {
+        flex-direction: column;
         text-align: center;
     }
 }

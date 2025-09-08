@@ -1,32 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Éditer Livre</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Livre</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}">Accueil</a> |
-        <a href="{{ url_for('livres') }}">Livres</a> |
-        <a href="{{ url_for('utilisateurs') }}">Étudiants</a> |
-        <a href="{{ url_for('emprunts') }}">Emprunts</a> |
-        <a href="{{ url_for('recherche') }}">Recherche</a>
-    </nav>
-    <hr>
+    <header>
+        <h1>📚 Modifier Livre</h1>
+        <div class="user-info">
+            Connecté en tant que: <strong>{{ session.user_name }}</strong> 
+            ({{ session.role }})
+            <a href="{{ url_for('logout') }}" class="btn-logout">Déconnexion</a>
+        </div>
+    </header>
 
-    <h1>Éditer Livre</h1>
-    <form method="post">
-        <input type="text" name="titre" value="{{ livre.Titre }}" required>
-        <input type="text" name="auteur" value="{{ livre.Auteur }}" required>
-        <input type="text" name="isbn" value="{{ livre.ISBN }}">
-        <select name="statut">
-            <option value="disponible" {% if livre.Statut == 'disponible' %}selected{% endif %}>Disponible</option>
-            <option value="emprunte" {% if livre.Statut == 'emprunte' %}selected{% endif %}>Emprunté</option>
-        </select>
-        <button type="submit">Enregistrer</button>
-    </form>
-    <a href="{{ url_for('livres') }}">Retour à la liste</a>
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}" class="active">📚 Livres</a>
+        <a href="{{ url_for('utilisateurs') }}">👥 Étudiants</a>
+        <a href="{{ url_for('emprunts') }}">📋 Emprunts</a>
+        <a href="{{ url_for('reservations') }}">📋 Réservations</a>
+        <a href="{{ url_for('admin_bibliothecaires') }}">🛡️ Bibliothécaires</a>
+        <a href="{{ url_for('recherche') }}">🔍 Recherche</a>
+    </nav>
+
+    <main>
+        <div class="form-section">
+            <h2>✏️ Modifier les informations du livre</h2>
+            <form method="post" class="form-grid">
+                <div class="form-row">
+                    <input type="text" name="titre" value="{{ livre.Titre }}" placeholder="Titre du livre" required>
+                    <input type="text" name="auteur" value="{{ livre.Auteur }}" placeholder="Auteur" required>
+                </div>
+                <div class="form-row">
+                    <input type="text" name="isbn" value="{{ livre.ISBN }}" placeholder="ISBN">
+                    <select name="statut" required>
+                        <option value="disponible" {% if livre.Statut == 'disponible' %}selected{% endif %}>Disponible</option>
+                        <option value="emprunte" {% if livre.Statut == 'emprunte' %}selected{% endif %}>Emprunté</option>
+                        <option value="reserve" {% if livre.Statut == 'reserve' %}selected{% endif %}>Réservé</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+                    <a href="{{ url_for('livres') }}" class="btn btn-secondary">↩️ Retour à la liste</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <style>
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+        flex: 1;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    
+    .btn-primary {
+        flex: 2;
+    }
+    </style>
 </body>
 </html>

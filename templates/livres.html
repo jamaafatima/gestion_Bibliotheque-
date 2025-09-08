@@ -17,14 +17,19 @@
     </header>
 
     <nav>
-        <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>🏠 Accueil</a>
-        <a href="{{ url_for('livres') }}" {% if request.endpoint == 'livres' %}class="active"{% endif %}>📚 Livres</a>
-    {% if session.role == 'bibliothecaire' %}
-        <a href="{{ url_for('utilisateurs') }}" {% if request.endpoint == 'utilisateurs' %}class="active"{% endif %}>👥 Étudiants</a>
-        <a href="{{ url_for('emprunts') }}" {% if request.endpoint == 'emprunts' %}class="active"{% endif %}>📋 Emprunts</a>
-        <a href="{{ url_for('admin_bibliothecaires') }}" {% if request.endpoint == 'admin_bibliothecaires' %}class="active"{% endif %}>🛡️ Bibliothécaires</a>
-    {% endif %}
-        <a href="{{ url_for('recherche') }}" {% if request.endpoint == 'recherche' %}class="active"{% endif %}>🔍 Recherche</a>
+        <a href="{{ url_for('index') }}">🏠 Accueil</a>
+        <a href="{{ url_for('livres') }}" class="active">📚 Livres</a>
+        {% if session.role == 'bibliothecaire' %}
+            <a href="{{ url_for('utilisateurs') }}">👥 Étudiants</a>
+            <a href="{{ url_for('emprunts') }}">📋 Emprunts</a>
+            <a href="{{ url_for('reservations') }}">📋 Réservations</a>
+            <a href="{{ url_for('admin_bibliothecaires') }}">🛡️ Bibliothécaires</a>
+        {% else %}
+            <a href="{{ url_for('mes_emprunts') }}">📖 Mes Emprunts</a>
+            <a href="{{ url_for('mes_reservations') }}">📋 Mes Réservations</a>
+            <a href="{{ url_for('change_password') }}">🔒 Changer mot de passe</a>
+        {% endif %}
+        <a href="{{ url_for('recherche') }}">🔍 Recherche</a>
     </nav>
 
     <main>
@@ -47,9 +52,7 @@
                     <th>Auteur</th>
                     <th>ISBN</th>
                     <th>Statut</th>
-                    {% if session.role == 'bibliothecaire' %}
-                        <th>Actions</th>
-                    {% endif %}
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,18 +62,30 @@
                     <td>{{ livre.Auteur }}</td>
                     <td>{{ livre.ISBN }}</td>
                     <td>
-                        <span class="status-badge {{ 'available' if livre.Statut == 'disponible' else 'borrowed' }}">
-                            {{ '✅ Disponible' if livre.Statut == 'disponible' else '📖 Emprunté' }}
-                        </span>
+                        {% if livre.Statut == 'disponible' %}
+                            <span class="status-badge available">✅ Disponible</span>
+                        {% elif livre.Statut == 'emprunte' %}
+                            <span class="status-badge borrowed">📖 Emprunté</span>
+                        {% elif livre.Statut == 'reserve' %}
+                            <span class="status-badge reserved">📋 Réservé</span>
+                        {% endif %}
                     </td>
-                    {% if session.role == 'bibliothecaire' %}
                     <td class="actions">
-                        <a href="{{ url_for('edit_livre', id=livre.ID) }}" class="btn btn-edit">✏️ Modifier</a>
-                        <a href="{{ url_for('delete_livre', id=livre.ID) }}" 
-                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')" 
-                           class="btn btn-delete">🗑️ Supprimer</a>
+                        {% if session.role == 'bibliothecaire' %}
+                            <a href="{{ url_for('edit_livre', id=livre.ID) }}" class="btn btn-edit">✏️ Modifier</a>
+                            <a href="{{ url_for('delete_livre', id=livre.ID) }}" 
+                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')" 
+                               class="btn btn-delete">🗑️ Supprimer</a>
+                        {% else %}
+                            {% if livre.Statut == 'disponible' %}
+                                <a href="{{ url_for('reserver_livre', livre_id=livre.ID) }}" 
+                                   onclick="return confirm('Voulez-vous réserver ce livre ?')"
+                                   class="btn btn-reserve">📋 Réserver</a>
+                            {% else %}
+                                <span class="text-muted">Non disponible</span>
+                            {% endif %}
+                        {% endif %}
                     </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -88,7 +103,93 @@
                 </div>
             </form>
         </div>
+        {% else %}
+        <div class="student-help">
+            <h3>💡 Comment emprunter un livre ?</h3>
+            <div class="help-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Réservez le livre en cliquant sur "Réserver"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Le bibliothécaire sera notifié de votre réservation</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Rendez-vous à la bibliothèque pour récupérer le livre</div>
+                </div>
+            </div>
+        </div>
         {% endif %}
     </main>
+
+    <style>
+    .btn-reserve {
+        background: #17a2b8;
+        color: white;
+    }
+    
+    .btn-reserve:hover {
+        background: #138496;
+    }
+    
+    .status-badge.reserved {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .text-muted {
+        color: #6c757d;
+        font-style: italic;
+    }
+    
+    .student-help {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+    
+    .student-help h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .help-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .step-number {
+        background: #667eea;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .step-text {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+    </style>
 </body>
 </html>
