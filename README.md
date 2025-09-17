@@ -1,0 +1,124 @@
+# GUIDE D'INSTALLATION - SYSTÈME DE GESTION DE BIBLIOTHÈQUE
+
+## Prérequis
+
+- Python 3.6 ou supérieur
+- MySQL Server 5.7 ou supérieur
+- pip (gestionnaire de paquets Python)
+
+## Étapes d'installation
+
+### 1. PRÉPARATION DE L'ENVIRONNEMENT
+
+- Clonez ou téléchargez le projet dans un dossier local
+- Ouvrez une invite de commande/terminal dans le dossier du projet
+
+### 2. INSTALLATION DES DÉPENDANCES PYTHON
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. CONFIGURATION DE LA BASE DE DONNÉES MYSQL
+
+- Démarrez votre serveur MySQL
+- Connectez-vous à MySQL avec un utilisateur admin:
+  ```bash
+  mysql -u root -p
+  ```
+- Créez la base de données:
+  ```sql
+  CREATE DATABASE bibliotheque;
+  ```
+- Créez les tables nécessaires (exécutez ces commandes dans MySQL):
+  ```sql
+  USE bibliotheque;
+  
+  CREATE TABLE Utilisateurs (
+      ID INT AUTO_INCREMENT PRIMARY KEY,
+      Nom VARCHAR(100) NOT NULL,
+      Email VARCHAR(100) UNIQUE NOT NULL,
+      NumeroEtudiant VARCHAR(50),
+      Role ENUM('etudiant', 'bibliothecaire') NOT NULL,
+      Password VARCHAR(255) NOT NULL
+  );
+  
+  CREATE TABLE Livres (
+      ID INT AUTO_INCREMENT PRIMARY KEY,
+      Titre VARCHAR(255) NOT NULL,
+      Auteur VARCHAR(255) NOT NULL,
+      ISBN VARCHAR(50),
+      Statut ENUM('disponible', 'emprunte', 'reserve') DEFAULT 'disponible'
+  );
+  
+  CREATE TABLE Emprunts (
+      ID INT AUTO_INCREMENT PRIMARY KEY,
+      ID_Livre INT,
+      ID_Utilisateur INT,
+      DateEmprunt DATE NOT NULL,
+      DateRetourPrevue DATE NOT NULL,
+      DateRetourReelle DATE,
+      FOREIGN KEY (ID_Livre) REFERENCES Livres(ID),
+      FOREIGN KEY (ID_Utilisateur) REFERENCES Utilisateurs(ID)
+  );
+  
+  CREATE TABLE Reservations (
+      ID INT AUTO_INCREMENT PRIMARY KEY,
+      ID_Livre INT,
+      ID_Utilisateur INT,
+      DateReservation DATE NOT NULL,
+      Statut ENUM('active', 'confirmee', 'annulee') DEFAULT 'active',
+      FOREIGN KEY (ID_Livre) REFERENCES Livres(ID),
+      FOREIGN KEY (ID_Utilisateur) REFERENCES Utilisateurs(ID)
+  );
+  ```
+
+### 4. CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES
+
+- Ouvrez le fichier `app.py`
+- Modifiez les paramètres de connexion MySQL dans la fonction `get_db_connection()`:
+  - **host**: votre serveur MySQL (localhost par défaut)
+  - **user**: votre nom d'utilisateur MySQL (root par défaut)
+  - **password**: votre mot de passe MySQL (qwerty par défaut - **À CHANGER!**)
+  - **database**: bibliotheque
+
+### 5. CRÉATION D'UN COMPTE BIBLIOTHÉCAIRE INITIAL
+
+- Insérez un utilisateur bibliothécaire dans la base de données:
+  ```sql
+  INSERT INTO Utilisateurs (Nom, Email, NumeroEtudiant, Role, Password)
+  VALUES ('Admin', 'admin@bibliotheque.com', 'ADMIN001', 'bibliothecaire', 'admin123');
+  ```
+
+### 6. LANCEMENT DE L'APPLICATION
+
+```bash
+python app.py
+```
+
+L'application sera accessible à l'adresse: http://localhost:5000
+
+### 7. CONNEXION INITIALE
+
+- **Utilisateur**: admin@bibliotheque.com
+- **Mot de passe**: admin123
+- **IMPORTANT**: Changez ce mot de passe après la première connexion!
+
+## Notes de sécurité
+
+- Changez la clé secrète dans `app.py` (variable `app.secret_key`)
+- Modifiez les identifiants MySQL par défaut
+- Utilisez des mots de passe forts
+- En production, configurez HTTPS
+- Limitez les accès à la base de données
+
+## Résolution de problèmes
+
+- Vérifiez que MySQL est démarré
+- Vérifiez les identifiants de connexion à la base de données
+- Assurez-vous que toutes les dépendances sont installées
+- Vérifiez que le port 5000 n'est pas utilisé par une autre application
+
+## Support
+
+En cas de problème, vérifiez les logs d'erreur dans la console où l'application est lancée.
